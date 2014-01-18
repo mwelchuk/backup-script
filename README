@@ -1,0 +1,33 @@
+Backup Script
+=============
+
+This shell script is a backup script, based on rsync and designed to be run
+from a cron job daily (or nightly).
+
+The script creates a rolling 7 day incremental backup, 12 monthly backups (at
+the beginning of each calendar month) and yearly backups.
+
+The script expects to be provided with a separate hard drive on which to make
+backups. This drive is kept in a read-only state most of the time, only
+switching to a read-write state whilst a backup is being performed.
+
+
+
+Installation
+------------
+
+Place the script in your preferred location. Open the script, there are a
+number of variables at the top of the script to configure the location of the
+backup drive and the locations to be backed up.
+
+Add the script to the root crontab (using the "crontab -e" command). To run
+the script nightly at 00:01 each night, add the following line (assuming the script is in "/root/"):
+
+1 0 * * * /root/backup.sh
+
+To log the output from the script, you can pipe the output to a file like this (assuming that you want the log to be written to "/root/latest_backup.sh"):
+
+1 0 * * * /root/backup.sh > /root/latest_backup.log
+
+To ensure that the script is run at the right time, make sure your computers time is correct and that the machine is left on at the required time!
+
