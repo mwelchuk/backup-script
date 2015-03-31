@@ -151,7 +151,7 @@ fi
 
 # Monthly snapshots - taken on the first day of the month as possible
 # (for the previous month)
-PREV_MONTH=$($DATE --date="${YESTERDAY} -1month" +%Y-%m)
+PREV_MONTH=$($DATE --date="${YEAR}-${MONTH}-15 -1month" +%Y-%m)
 if [ ! -d $MOUNT_POINT/${PREV_MONTH} ]
 then
 	$ECHO "Attempting to create monthly backup"
