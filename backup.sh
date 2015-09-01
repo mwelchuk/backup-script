@@ -155,7 +155,8 @@ PREV_MONTH=$($DATE --date="${YEAR}-${MONTH}-15 -1month" +%Y-%m)
 if [ ! -d $MOUNT_POINT/${PREV_MONTH} ]
 then
 	$ECHO "Attempting to create monthly backup"
-	$CP -al $MOUNT_POINT/${YEAR}-${MONTH}-01 $MOUNT_POINT/${PREV_MONTH}
+	LAST_DAY=$($DATE --date="${YEAR}-${MONTH}-01 -1day" +%Y-%m-%d)
+	$CP -al $MOUNT_POINT/${LAST_DAY} $MOUNT_POINT/${PREV_MONTH}
 	if [ "$?" != "0" ]
 	then
 		$ECHO "ERROR: Failed to create monthly backup"
