@@ -66,7 +66,7 @@ MONTH=$($DATE +%m)
 YEAR=$($DATE +%Y)
 
 YESTERDAY=$($DATE --date="${YEAR}-${MONTH}-${DAY} -1day" +%Y-%m-%d)
-PREV=$($DATE --date="${YESTERDAY} -1day" +%Y-%m-%d)
+PREV_DAY=$($DATE --date="${YESTERDAY} -1day" +%Y-%m-%d)
 
 REACH=31
 
@@ -75,18 +75,18 @@ if [ ! -d $MOUNT_POINT/${YESTERDAY} ]
 then
 	# Find the last backup
 	LOOP=0
-	while [ ! -d $MOUNT_POINT/${PREV} ] && [ $LOOP -lt $REACH ]
+	while [ ! -d $MOUNT_POINT/${PREV_DAY} ] && [ $LOOP -lt $REACH ]
 	do
-		#$ECHO "$PREV doesn't exist"
-		PREV=$($DATE --date="${PREV} -1day" +%Y-%m-%d)
+		#$ECHO "${PREV_DAY} doesn't exist"
+		PREV_DAY=$($DATE --date="${PREV_DAY} -1day" +%Y-%m-%d)
 		let LOOP=$LOOP+1
 	done
 
-	if [ -d $MOUNT_POINT/${PREV} ]
+	if [ -d $MOUNT_POINT/${PREV_DAY} ]
 	then
-		$ECHO "Found backup from $PREV. Starting from hard copy."
+		$ECHO "Found backup from ${PREV_DAY}. Starting from hard copy."
 
-		$CP -al $MOUNT_POINT/${PREV} $MOUNT_POINT/${YESTERDAY}
+		$CP -al $MOUNT_POINT/${PREV_DAY} $MOUNT_POINT/${YESTERDAY}
 		if [ "$?" != "0" ]
 		then
 			$ECHO "ERROR: Failed to create copy to: $YESTERDAY"
