@@ -37,11 +37,12 @@ DATE=/bin/date
 MKDIR=/bin/mkdir
 
 # Backup device
-MOUNT_DEVICE=/dev/sdb1
-MOUNT_POINT=/root/backup
+MOUNT_DEVICE=/dev/md0
+MOUNT_POINT=/srv/backup
 
 # Locations to backup
-BACKUP_LOCATIONS=("/home" "/var/lib/mythtv/pictures")
+#BACKUP_LOCATIONS=("/home" "/srv/photos" "/var/lib/mythtv/pictures" "/var/lib/lxc/athena/rootfs/var/lib/dokuwiki")
+BACKUP_LOCATIONS=("zeus.home:/home" "zeus.home:/srv/media/pictures" "zeus.home:/var/lib/lxc/athena/rootfs/var/lib/dokuwiki")
 
 RETVAL=0
 
@@ -108,13 +109,24 @@ then
 	do
 		DIR=${BACKUP_LOCATIONS[item]}
 		NAME=${DIR##*/}
+		SERVER=${DIR%%:*}
 
-		if [ ! -d $MOUNT_POINT/${YESTERDAY}/$NAME ]
+		if [ ! -d $MOUNT_POINT/${YESTERDAY}/${SERVER} ]
 		then
-			$MKDIR $MOUNT_POINT/${YESTERDAY}/$NAME
+			$MKDIR $MOUNT_POINT/${YESTERDAY}/${SERVER}
 			if [ "$?" != "0" ]
 			then
-				$ECHO "ERROR: Failed to create directory: $NAME"
+				$ECHO "ERROR: Failed to create directory: ${SERVER}"
+				RETVAL=1
+			fi
+		fi
+
+		if [ ! -d $MOUNT_POINT/${YESTERDAY}/${SERVER}/${NAME} ]
+		then
+			$MKDIR $MOUNT_POINT/${YESTERDAY}/${SERVER}/${NAME}
+			if [ "$?" != "0" ]
+			then
+				$ECHO "ERROR: Failed to create directory: ${NAME}"
 				RETVAL=1
 			fi
 		fi
@@ -122,7 +134,7 @@ then
 		# Rsync from the system into the latest snapshot
 		# rsync behaves like cp --remove-destination by default
 		# so the destination is unlinked first.
-		$RSYNC -va --delete --delete-excluded /$DIR/ $MOUNT_POINT/${YESTERDAY}/$NAME
+		$RSYNC -vaz -e ssh --delete --delete-excluded $DIR $MOUNT_POINT/${YESTERDAY}/$SERVER/$NAME
 		if [ "$?" != "0" ]
 		then
 			$ECHO "ERROR: Failed to update: $DIR"
